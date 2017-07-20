@@ -1,19 +1,14 @@
 package org.lv
 
-import io.vertx.scala.ext.web.Router
 import io.vertx.scala.core.Vertx
-import org.lv.checkin.routing.Checkin
-import org.lv.checkout.routing.Checkout
 import org.lv.server.Server
 
+import scala.util.{Failure, Success}
+
 object App {
-  def main(args: Array[String]): Unit = {
-    implicit val vertx = Vertx.vertx()
-
-    val api = Router.router(vertx)
-    api.post("/:buildingId/:badgeId/checkin").handler(Checkin.checkin)
-    api.post("/:buildingId/:badgeId/checkout").handler(Checkout.checkout)
-
-    Server.boostrap(8000, api)
-  }
+  def main(args: Array[String]): Unit =
+    Server.boostrap(Vertx.vertx()) match {
+      case Success(server) => println(s"Running app port ${server.actualPort()}")
+      case Failure(error) => println(s"could not run vertx http server : ${error.getMessage}")
+    }
 }
